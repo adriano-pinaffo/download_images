@@ -14,7 +14,8 @@ def download_image(img):
     title = title.replace('"', '').replace('’', '').replace('?', '').replace('/', '').replace('\n', '')
     title = title[:30] + '.jpg'
     url = img['urls']['raw']
-    print(f'Image {title} download started...')
+    time.sleep(0.1) # for the next "Start" message show up after the previous "Downloaded"
+    print(f'Started download of {title}')
 
     img_blob = requests.get(url, timeout=5).content
     with open(destination + '/' + title, 'wb') as img_file:
@@ -40,7 +41,7 @@ for o, v in opts:
     if o in ['-d', '--destination']:
         destination = os.path.realpath(v)
     elif o in ['-t', '--threads']:
-        threads = v
+        threads = int(v)
     elif o in ['-n', '--number']:
         number = v
     else:
@@ -56,11 +57,12 @@ resp_dict = resp.json()
 
 images = resp_dict['photos']['results']
 
-with concurrent.futures.ThreadPoolExecutor() as executor:
+with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
+
     results = [executor.submit(download_image, img) for img in images]
 
     for t in concurrent.futures.as_completed(results):
-        print(f'Image {t.result()} downloaded')
+        print(f'Downloaded {t.result()}')
 
 stop = time.perf_counter()
 
