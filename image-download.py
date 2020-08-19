@@ -8,13 +8,26 @@ import getopt
 import concurrent.futures
 
 
+def show_help():
+    """Show help."""
+    print(f"""Usage: {sys.argv[0]} [OPTIONS] Keywords
+  -h, --help        Show this help
+  -d, --destination Folder to save the files
+  -t, --threads     Number of concurrent downloads
+  -n, --number      Number of images to download
+
+  Example:
+  python {sys.argv[0]} -d ~/Pictures -t5 -n10 planets""")
+    sys.exit(0)
+
+
 def download_image(img):
     """Function to download image."""
     title = img['description'] if img['description'] is not None else img['id']
     title = title.replace('"', '').replace('’', '').replace('?', '').replace('/', '').replace('\n', '')
     title = title[:30] + '.jpg'
     url = img['urls']['raw']
-    time.sleep(0.1) # for the next "Start" message show up after the previous "Downloaded"
+    time.sleep(0.1)  # for the next "Start" message show up after the previous "Downloaded"
     print(f'Started download of {title}')
 
     img_blob = requests.get(url, timeout=5).content
@@ -23,8 +36,8 @@ def download_image(img):
     return title
 
 
-defopts = ['destination=', 'threads=', 'number=']
-opts, args = getopt.getopt(sys.argv[1:], 'd:t:n:', defopts)
+defopts = ['help', 'destination=', 'threads=', 'number=']
+opts, args = getopt.getopt(sys.argv[1:], 'hd:t:n:', defopts)
 threads = 1
 destination = os.path.realpath(os.curdir)
 number = 20
@@ -34,11 +47,13 @@ search_uri = '/napi/search'
 parameters = {'query': '', 'xp': '', 'per_page': 20}
 
 if len(sys.argv) == 1:
-    print('Enter the keyword')
-    sys.exit(0)
+    print('Enter the keywords')
+    show_help()
 
 for o, v in opts:
-    if o in ['-d', '--destination']:
+    if o in ['-h', '--help']:
+        show_help()
+    elif o in ['-d', '--destination']:
         destination = os.path.realpath(v)
     elif o in ['-t', '--threads']:
         threads = int(v)
@@ -60,7 +75,6 @@ images = resp_dict['photos']['results']
 with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
 
     results = [executor.submit(download_image, img) for img in images]
-
     for t in concurrent.futures.as_completed(results):
         print(f'Downloaded {t.result()}')
 
