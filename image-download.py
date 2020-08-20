@@ -12,12 +12,15 @@ def show_help():
     """Show help."""
     print(f"""Usage: {sys.argv[0]} [OPTIONS] Keywords
   -h, --help        Show this help
-  -d, --destination Folder to save the files
-  -t, --threads     Number of concurrent downloads
-  -n, --number      Number of images to download
+  -d, --destination Folder to save the files (Default current dir)
+  -t, --threads     Number of concurrent downloads (Default ThreadPoolExecutor default)
+  -n, --number      Number of images to download (Default 20)
 
   Example:
-  python {sys.argv[0]} -d ~/Pictures -t5 -n10 planets""")
+  python {sys.argv[0]} -d ~/Pictures -t5 -n10 planets
+
+  Contact:
+  https://github.com/adriano-pinaffo/download_images""")
     sys.exit(0)
 
 
@@ -38,7 +41,7 @@ def download_image(img):
 
 defopts = ['help', 'destination=', 'threads=', 'number=']
 opts, args = getopt.getopt(sys.argv[1:], 'hd:t:n:', defopts)
-threads = 1
+threads = None
 destination = os.path.realpath(os.curdir)
 number = 20
 
