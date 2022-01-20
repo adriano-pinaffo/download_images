@@ -1,5 +1,5 @@
 # download_images
-Simple program to download how many images from unsplash.com as you want. You provide the options and the keywords, the program connects to unsplash.com and download the images. Pure and simple.
+Simple program to download as many images as you want from unsplash.com. You provide the options and the keywords, the program connects to unsplash.com and download the images. Pure and simple.
 <pre>
 Usage: image-download.py [OPTIONS] Keywords
   -h, --help        Show this help
